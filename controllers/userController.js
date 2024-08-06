@@ -1,8 +1,8 @@
 const User = require("./../models/userModel");
 const AppError = require("./../utils/appError");
 
-exports.getAllUsers = (req, res, next) => {
-    const users = User.find();
+exports.getAllUsers = async(req, res, next) => {
+    const users = await User.find();
 
     if (!users) next(new AppError("Users not found!", 404));
 
@@ -14,8 +14,8 @@ exports.getAllUsers = (req, res, next) => {
     });
 }
 
-exports.updateUser = (req, res, next) => {
-    const user = User.findOneAndUpdate(req.body, {});
+exports.updateUser = async(req, res, next) => {
+    const user = await User.findOneAndUpdate(req.body, {});
 
     if (!user) next(new AppError("User not found!", 404));
 
@@ -25,4 +25,8 @@ exports.updateUser = (req, res, next) => {
             user
         }
     });
+}
+
+exports.deleteUser = async(req, res, next) => {
+    const user = await User.findOne();
 }

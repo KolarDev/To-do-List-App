@@ -14,10 +14,10 @@ const taskSchema = new mongoose.Schema({
         minLength: [6, "Too short"]
     },
     startdate: {
-        type: date,
+        type: Date,
         default: Date.now()
     },
-    duedate: {
+    dueDate: {
         type: Date,
         required: [true, "Set task time!"],
         validate: {
@@ -34,8 +34,18 @@ const taskSchema = new mongoose.Schema({
     priority: {
         type: String,
         enum: ["low", "medium", "high"]
-    }
-});
+    },
+    tags: [String],
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    subtasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
+
+},
+    { timestamps: true }
+);
 
 const Task = mongoose.model("Task", taskSchema);
 

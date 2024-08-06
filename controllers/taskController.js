@@ -13,8 +13,12 @@ exports.getAllTasks = (req, res, next) => {
     });
 }
 
-exports.createTask = (req, res, next) => {
-    const task = Task.create(req.body);
+exports.createTask = async (req, res, next) => {
+    // const task = Task.create(req.body);
+
+    const { title, description, dueDate, status, priority, tags } = req.body;
+    const task = new Task({ title, description, dueDate, status, priority, tags, user: req.user._id });
+    await task.save();
 
     res.status(201).json({
         status: "success",
@@ -23,6 +27,8 @@ exports.createTask = (req, res, next) => {
         }
     });
 }
+
+
 
 
 exports.getTask = (req, res, next) => {
