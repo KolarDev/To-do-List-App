@@ -13,19 +13,9 @@ const taskSchema = new mongoose.Schema({
         required: [true, "Please input task description"],
         minLength: [6, "Too short"]
     },
-    startdate: {
-        type: Date,
-        default: Date.now()
-    },
     dueDate: {
         type: Date,
-        required: [true, "Set task time!"],
-        validate: {
-            validator: function (date) {
-                return date >= this.startdate
-            },
-            message: "Due date is less than start date"
-        }
+        required: [true, "Set task due time!"]
     },
     status: {
         type: String,
@@ -39,7 +29,7 @@ const taskSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true
+        required: true,
     },
     subtasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
 

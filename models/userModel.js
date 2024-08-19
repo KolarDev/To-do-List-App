@@ -42,6 +42,17 @@ const userSchema = new mongoose.Schema({
         select: false
     }
     
+},
+    {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+    }
+);
+
+// Reveal only active users
+userSchema.pre(/^find/, function (next) {
+    this.find({ active: { $ne: false } });
+    next();
 });
 
 // Hash password before save
@@ -78,10 +89,21 @@ userSchema.methods.genPasswordResetToken = (req, res, next) => {
         .update(resetToken)
         .digest("hex");
 
-    console.log({ resetToken }, this.passwordResetToken);
+    // console.log({ resetToken }, this.passwordResetToken);
     this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
 
     return resetToken;
+}
+
+userSchema.methods.changedPasswordafter = function (JWTTimestamp) {
+    if (this.passwordChangedAt) {
+        // Parsing the time the user changed the password into integer
+        const changedTimeStamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
+
+        console.log(changedTimeStamp, JWTTimestamp);
+        // This will return true if the user actually changed the password after the token has been issued
+        return JWTTimestamp < changedTimeStamp;
+    }
 }
 
 const User = mongoose.model("User", userSchema);

@@ -1,5 +1,8 @@
 const Task = require("./../models/taskModel");
 
+
+
+// Get all tasks
 exports.getAllTasks = (req, res, next) => {
     const tasks = Task.find();
 
@@ -13,12 +16,13 @@ exports.getAllTasks = (req, res, next) => {
     });
 }
 
+// Create new Task
 exports.createTask = async (req, res, next) => {
     // const task = Task.create(req.body);
 
     const { title, description, dueDate, status, priority, tags } = req.body;
-    const task = new Task({ title, description, dueDate, status, priority, tags, user: req.user._id });
-    await task.save();
+    const task = await Task.create({ title, description, dueDate, status, priority, tags }); // user: req.user._id 
+    
 
     res.status(201).json({
         status: "success",
@@ -28,11 +32,9 @@ exports.createTask = async (req, res, next) => {
     });
 }
 
-
-
-
+// Get a task by title
 exports.getTask = (req, res, next) => {
-    const task = Task.findOne(req.params.taskname);
+    const task = Task.findById(req.params.id);
 
     if (!task) next(new AppError("No task with that name!", 404));
 
@@ -44,8 +46,9 @@ exports.getTask = (req, res, next) => {
     });
 }
 
-exports.updateTask = (req, res, next) => {
-    const task = Task.findOneAndUpdate(req.params.title);
+// Update a task by title
+exports.updateTask = async (req, res, next) => {
+    const task = await Task.findOneAndUpdate(req.params.id);
 
     if (!task) next(new AppError("No task with that name!", 404));
 
@@ -57,8 +60,9 @@ exports.updateTask = (req, res, next) => {
     });
 }
 
-exports.deleteTask = (req, res, next) => {
-    const task = Task.findOneAndDelete(req.params.title);
+// Delete a task by title
+exports.deleteTask = async(req, res, next) => {
+    const task = await Task.findOneAndDelete(req.params.id);
 
     if (!task) next(new AppError("No task with that name!", 404));
 
@@ -69,3 +73,36 @@ exports.deleteTask = (req, res, next) => {
         }
     });
 }
+
+// Mark task as complete
+exports.completeTask = async(req, res, next) => {
+    const task = await Task.findOne(req.params.id);
+
+    if (!task) next(new AppError("No task with that name!", 404));
+
+    task.status = "completed";
+    await task.save();
+
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            task
+        }
+    });
+}
+
+// Get completed tasks
+exports.completedTasks = async(req, res, next) => {
+    const tasks = await Task.find({ status: "completed"});
+
+    if (!tasks) next(new AppError("You have no completed task", 404));
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            tasks
+        }
+    });
+}
+

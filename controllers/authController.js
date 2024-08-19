@@ -42,6 +42,14 @@ exports.register = async (req, res) => {
     console.log(newUser);
 
     sendToken(newUser, 201, res);
+
+    // req.newUser = newUser; //for use to send email
+    // next(); // Move on...
+}
+
+
+exports.sendConfirmationEmail = (req, res) => {
+
 }
 
 // Logging user in
@@ -98,7 +106,7 @@ exports.forgotPassword = async (req, res, next) => {
     }
 
     // Generate random password reset token
-    const resetToken = user.createPasswordResetToken();
+    const resetToken = user.genPasswordResetToken();
     await user.save({ validateBeforeSave: false });
 
 
@@ -161,7 +169,7 @@ exports.resetPassword = async (req, res, next) => {
 };
 
 // Password Update Functionality. Logged in users changing password
-exports.updatePassword = catchAsync(async (req, res, next) => {
+exports.updatePassword = async (req, res, next) => {
     
     // 1. Get the logged in user from collection
     const user = await User.findById(req.user.id).select("+password");
@@ -178,4 +186,4 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 
     // 4. Log the user in. Send jwt
     sendToken(user, 200, res);
-});
+};

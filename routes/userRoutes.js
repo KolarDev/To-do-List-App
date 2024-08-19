@@ -5,17 +5,31 @@ const authController = require("./../controllers/authController");
 
 const router = express.Router();
 
-
-router.post("/register", authController.register);
-router.post("/login", authController.login);
+// 1. Registration and login
+router.post("/register", authController.register); // User Registration
+router.post("/login", authController.login); // User Login
     
-router
-    .route("/")
-    .get(userController.getAllUsers);
-
-
+// 2. Password Management
 router
     .route("/:id")
-    .get(userController.getUser)
-    .patch(userController.updateUser)
-    .delete(userController.deleteUser)
+    .patch(authController.updatePassword) // Update User Password
+    .patch(authController.forgotPassword) // If user forgets his password
+    .patch(authController.resetPassword) // Reset user password 
+
+
+router
+    .route("/")
+    .get(userController.getAllUsers); // Get all Users (Restricted to only admin)
+
+
+// User Profile routes
+router.use(authController.protectRoute);
+router
+    .route("/profile/:id")
+    .get(userController.userProfile) // Get User Profile details
+    .patch(userController.updateProfile) // Update User Profile details
+    .delete(userController.deleteUser) // Delete User Account
+
+
+
+module.exports = router;
