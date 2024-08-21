@@ -12,7 +12,7 @@
   3. **Database:** MongoDB mongoose
   3. **Packages:** mongoose, validator for DB and schema Management . bcryptjs and crypto for password management and hashing. JsonWebToken for user authentication and authorization and a lot more..
 
-## Features include;
+## Features include:
   - User Register/Login Using JsonWebToken
   - Creating, Reading, Updating and Deleting task
   - Task schema include  title, description, dueDate, status, priority, tags
@@ -20,8 +20,8 @@
   - Email notification of due tasks
   More to be added
 
-## Routes available in the api:
-# USER:
+## Routes available in the API:
+# User:
   - Register route
   - Login route
   - Update password route
@@ -31,7 +31,7 @@
   - Update user profile route
   - Delete user profile route
 
-# TASK:
+# Task:
   - Get All task route
   - Get a particular task route
   - Update a task route

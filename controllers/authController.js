@@ -1,6 +1,7 @@
 const User = require("./../models/userModel");
 const AppError = require("./../utils/appError");
 const jwt = require("jsonwebtoken");
+const Email = require("./../utils/email");
 
 
 const generateToken = (id) => {
@@ -43,14 +44,19 @@ exports.register = async (req, res) => {
 
     sendToken(newUser, 201, res);
 
+    confirmUrl = `${req.protocol}://${req.get("host")}/confirmed`;
+    subject = `Welcome ${newUser.username}. Please confirm your account`;
+    message = `We are glad to have you on our list.\n 
+    Do well to click the below link to confirm your account. \n
+    If you didn't use this email on our website, kindly reply to this email to secure your email`;
+
+    await new Email(newUser, confirmUrl).send(message, subject);
+
     // req.newUser = newUser; //for use to send email
     // next(); // Move on...
 }
 
 
-exports.sendConfirmationEmail = (req, res) => {
-
-}
 
 // Logging user in
 exports.login = async (req, res) => {
@@ -116,26 +122,6 @@ exports.forgotPassword = async (req, res, next) => {
     const message = `Forgot your Password ? Click the button below to reset your password
     ${resetURL} \n Ignore this email If you didn't request for this. (Expires in 10mins)`;
 
-    // try {
-    //     await sendMail({
-    //         email: user.email,
-    //         subject: "Password Reset Token.",
-    //         message
-    //     });
-    
-    //     res.status(200).json({
-    //         status: "success",
-    //         message: "Token sent to email!"
-    //     });
-    // } catch (err) {
-    //     console.log(err);
-    //     user.passwordResetToken = undefined;
-    //     user.passwordResetExpires = undefined;
-    //     await user.save({ validateBeforeSave: false });
-
-    //     return next(new AppError("There was an error sending the email, Try again later!", 500));
-     
-    // }
     
 };
 
