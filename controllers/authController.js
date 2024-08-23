@@ -44,13 +44,13 @@ exports.register = async (req, res) => {
 
     sendToken(newUser, 201, res);
 
-    confirmUrl = `${req.protocol}://${req.get("host")}/confirmed`;
-    subject = `Welcome ${newUser.username}. Please confirm your account`;
-    message = `We are glad to have you on our list.\n 
-    Do well to click the below link to confirm your account. \n
-    If you didn't use this email on our website, kindly reply to this email to secure your email`;
+    // confirmUrl = `${req.protocol}://${req.get("host")}/confirmed`;
+    // subject = `Welcome ${newUser.username}. Please confirm your account`;
+    // message = `We are glad to have you on our list.\n 
+    // Do well to click the below link to confirm your account. \n
+    // If you didn't use this email on our website, kindly reply to this email to secure your email`;
 
-    await new Email(newUser, confirmUrl).send(message, subject);
+    // await new Email(newUser, confirmUrl).send(message, subject);
 
     // req.newUser = newUser; //for use to send email
     // next(); // Move on...
@@ -121,6 +121,9 @@ exports.forgotPassword = async (req, res, next) => {
 
     const message = `Forgot your Password ? Click the button below to reset your password
     ${resetURL} \n Ignore this email If you didn't request for this. (Expires in 10mins)`;
+
+    // await new Email(user, confirmUrl).send(message, subject);
+
 
     
 };

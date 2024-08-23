@@ -1,4 +1,4 @@
-### Creating my To-do List Api:
+# Creating my To-do List Api:
 
 ## Todo-List API
 
@@ -21,7 +21,7 @@
   More to be added
 
 ## Routes available in the API:
-# User:
+### User:
   - Register route
   - Login route
   - Update password route
@@ -31,7 +31,7 @@
   - Update user profile route
   - Delete user profile route
 
-# Task:
+### Task:
   - Get All task route
   - Get a particular task route
   - Update a task route

@@ -22,7 +22,13 @@ exports.userProfile = async(req, res, next) => {
 }
 
 // Update User Profile details
-exports.updateProfile = async(req, res, next) => {
+exports.updateProfile = async (req, res, next) => {
+    
+    // 1. Check if the user is not trying to update the password
+    if (req.body.password || req.body.passwordConfirm) {
+        return (new AppError("This route is not for password update!", 400));
+    }
+    
     const user = await User.findOneAndUpdate(req.body, {});
 
     if (!user) next(new AppError("User not found!", 404));
