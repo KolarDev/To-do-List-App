@@ -83,7 +83,6 @@ exports.completeTask = async(req, res, next) => {
     task.status = "completed";
     await task.save();
 
-
     res.status(200).json({
         status: "success",
         data: {
