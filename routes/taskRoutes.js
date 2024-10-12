@@ -1,5 +1,6 @@
 const express = require("express");
 const taskController = require("./../controllers/taskController");
+const authController = require("./../controllers/authController");
 
 const router = express.Router();
 
@@ -7,7 +8,7 @@ const router = express.Router();
 router
     .route("/")
     .get(taskController.getAllTasks) // Get all tasks
-    .post(taskController.createTask); // Create new Task
+    .post(authController.protectRoute, taskController.createTask); // Create new Task
 
 router
     .route("/:id")

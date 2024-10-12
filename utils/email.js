@@ -1,54 +1,54 @@
 const nodemailer = require("nodemailer");
-
-
-// Email template adapted from https://github.com/leemunroe/responsive-html-email-template
-// Converted from HTML using https://html2pug.now.sh/
-
+const ejs = require("ejs");
+const htmlToText = require("html-to-text");
 
 module.exports = class Email {
-    constructor(user, url) {
-        this.to = user.email;
-        this.url = url;
-        this.from = `kolardev <${process.env.EMAIL_FROM}>`;
-        this.userName = user.name.split(" ")[0];
-        
-    }
+  constructor(user, url, task) {
+    this.to = user.email;
+    this.url = url;
+    this.user = user;
+    this.task = task;
+    this.from = `Todo <${process.env.EMAIL_FROM}>`;
+  }
 
-    newTransport() {
+  newTransport() {
+    return nodemailer.createTransport({
+      host: process.env.BREVO_HOST,
+      port: process.env.BREVO_PORT,
+      auth: {
+        user: process.env.BREVO_USERNAME,
+        pass: process.env.BREVO_PASSWORD,
+      },
+    });
+  }
 
-        if (process.env.NODE_ENV === 'production') {
-            // Sendgrid
-            return nodemailer.createTransport({
-              service: 'SendGrid',
-              auth: {
-                user: process.env.SENDGRID_USERNAME,
-                pass: process.env.SENDGRID_PASSWORD
-              }
-            });
-        }
-        
-        return nodemailer.createTransport({
-            host: process.env.EMAIL_HOST,
-            port:  process.env.EMAIL_PORT,
-            auth: {
-                user: process.env.EMAIL_USERNAME,
-                pass: process.env.EMAIL_PASSWORD
-            }
-            
-        });
-    }
+  async send(text, subject) {
+    // const html = await ejs.renderFile(
+    //   `${__dirname}/../views/emails/${template}.ejs`,
+    //   {
+    //     user: this.user,
+    //     url: this.url,
+    //     subject,
+    //     task: this.task,
+    //   }
+    // );
 
-    async send(message, subject) {
-        
-        mailOptions = {
-            from: this.from,
-            to: this.to,
-            subject,
-            text: message
-        }
+    const mailOptions = {
+      from: this.from,
+      to: this.to,
+      subject,
+      //   html,
+      text,
+    };
 
-        await newTransport().sendMail(mailOptions);
-    }
+    await this.newTransport().sendMail(mailOptions);
+  }
 
-    
-}
+  async sendWelcome() {
+    await this.send("welcome", "Welcome to KolPay");
+  }
+
+  async deadlineAlert() {
+    await this.send("deadlinenotify", "Welcome to Our Todo List App");
+  }
+};

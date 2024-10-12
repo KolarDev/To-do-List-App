@@ -1,107 +1,131 @@
 const Task = require("./../models/taskModel");
-
-
+const User = require("./../models/userModel");
+const Email = require("./../utils/email");
 
 // Get all tasks
 exports.getAllTasks = (req, res, next) => {
-    const tasks = Task.find();
+  const tasks = Task.find();
 
-    if (!tasks) next(new AppError("No task found!", 404));
+  if (!tasks) next(new AppError("No task found!", 404));
 
-    res.status(200).json({
-        status: "success",
-        data: {
-            tasks
-        }
-    });
-}
+  res.status(200).json({
+    status: "success",
+    data: {
+      tasks,
+    },
+  });
+};
 
 // Create new Task
 exports.createTask = async (req, res, next) => {
-    // const task = Task.create(req.body);
+  // const task = Task.create(req.body);
 
-    const { title, description, dueDate, status, priority, tags } = req.body;
-    const task = await Task.create({ title, description, dueDate, status, priority, tags }); // user: req.user._id 
-    
+  const { title, description, dueDate, status, priority, tags, user } =
+    req.body;
+  const task = await Task.create({
+    title,
+    description,
+    dueDate,
+    status,
+    priority,
+    tags,
+    user: req.user._id,
+  }); // user: req.user._id
 
-    res.status(201).json({
-        status: "success",
-        data: {
-            task
-        }
-    });
-}
+  // Optionally, send immediate notification if deadline is within 24 hours
+  const now = new Date();
+  const deadlineDate = new Date(dueDate);
+  const timeDifference = deadlineDate - now;
+
+  console.log(now);
+  console.log(deadlineDate);
+
+  if (timeDifference > 0 && timeDifference <= 60 * 60 * 1000) {
+    const user = await User.findById(req.user._id);
+    if (user) {
+      await new Email(user, undefined, task).send("hi thenmwbnw", "todo list");
+    }
+    task.notified = true;
+    await task.save();
+  }
+
+  res.status(201).json({
+    status: "success",
+    data: {
+      task,
+    },
+  });
+};
 
 // Get a task by title
 exports.getTask = (req, res, next) => {
-    const task = Task.findById(req.params.id);
+  const task = Task.findById(req.params.id);
 
-    if (!task) next(new AppError("No task with that name!", 404));
+  if (!task) next(new AppError("No task with that name!", 404));
 
-    res.status(200).json({
-        status: "success",
-        data: {
-            task
-        }
-    });
-}
+  res.status(200).json({
+    status: "success",
+    data: {
+      task,
+    },
+  });
+};
 
 // Update a task by title
 exports.updateTask = async (req, res, next) => {
-    const task = await Task.findOneAndUpdate(req.params.id);
+  const task = await Task.findOneAndUpdate(req.params.id);
 
-    if (!task) next(new AppError("No task with that name!", 404));
+  if (!task) next(new AppError("No task with that name!", 404));
 
-    res.status(200).json({
-        status: "success",
-        data: {
-            task
-        }
-    });
-}
+  res.status(200).json({
+    status: "success",
+    data: {
+      task,
+    },
+  });
+};
 
 // Delete a task by title
-exports.deleteTask = async(req, res, next) => {
-    const task = await Task.findOneAndDelete(req.params.id);
+exports.deleteTask = async (req, res, next) => {
+  const task = await Task.findOneAndDelete(req.params.id);
 
-    if (!task) next(new AppError("No task with that name!", 404));
+  if (!task) next(new AppError("No task with that name!", 404));
 
-    res.status(204).json({
-        status: "success",
-        data: {
-            data: null
-        }
-    });
-}
+  res.status(204).json({
+    status: "success",
+    data: {
+      data: null,
+    },
+  });
+};
 
 // Mark task as complete
-exports.completeTask = async(req, res, next) => {
-    const task = await Task.findOne(req.params.id);
+exports.completeTask = async (req, res, next) => {
+  const task = await Task.findOne(req.params.id);
 
-    if (!task) next(new AppError("No task with that name!", 404));
+  if (!task) next(new AppError("No task with that name!", 404));
 
-    task.status = "completed";
-    await task.save();
+  task.status = "completed";
+  await task.save();
 
-    res.status(200).json({
-        status: "success",
-        data: {
-            task
-        }
-    });
-}
+  res.status(200).json({
+    status: "success",
+    data: {
+      task,
+    },
+  });
+};
 
 // Get completed tasks
-exports.completedTasks = async(req, res, next) => {
-    const tasks = await Task.find({ status: "completed"});
+exports.completedTasks = async (req, res, next) => {
+  const tasks = await Task.find({ status: "completed" });
 
-    if (!tasks) next(new AppError("You have no completed task", 404));
+  if (!tasks) next(new AppError("You have no completed task", 404));
 
-    res.status(200).json({
-        status: "success",
-        data: {
-            tasks
-        }
-    });
-}
-
+  res.status(200).json({
+    status: "success",
+    data: {
+      tasks,
+    },
+  });
+};
