@@ -68,6 +68,20 @@ exports.login = async (req, res, next) => {
   sendToken(user, 200, res);
 };
 
+// Logout
+exports.logout = (req, res) => {
+  // Token invalidation logic goes here (e.g., using a blacklist)
+  res.cookie("jwt", "loggedout", {
+    expiresIn: new Date(Date.now() + 10 * 1000),
+    httpOnly: true
+  });
+
+  res.status(200).json({
+    status: "success",
+    message: "Logged out successfully.",
+  });
+};
+
 exports.protectRoute = async (req, res, next) => {
   // 1. Get the token from the authorization header
   let token;

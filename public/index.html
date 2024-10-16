@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>To-Do App - Login/Signup</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="auth-container">
+      <h1>Welcome to To-Do App</h1>
+
+      <!-- Toggle between Login and Signup -->
+      <div class="auth-toggle">
+        <button id="login-toggle" class="active">Login</button>
+        <button id="signup-toggle">Sign Up</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="auth-form">
+        <input type="email" id="login-email" placeholder="Email" required />
+        <input
+          type="password"
+          id="login-password"
+          placeholder="Password"
+          required
+        />
+        <button type="submit">Login</button>
+      </form>
+
+      <!-- Signup Form -->
+      <form id="signup-form" class="auth-form hidden">
+        <input
+          type="text"
+          id="signup-username"
+          placeholder="Username"
+          required
+        />
+        <input type="email" id="signup-email" placeholder="Email" required />
+        <input
+          type="password"
+          id="signup-password"
+          placeholder="Password"
+          required
+        />
+        <button type="submit">Sign Up</button>
+      </form>
+
+      <!-- Status Messages -->
+      <div id="auth-status"></div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
