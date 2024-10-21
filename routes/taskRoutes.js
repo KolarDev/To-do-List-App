@@ -4,17 +4,18 @@ const authController = require("./../controllers/authController");
 
 const router = express.Router();
 
+router
+  .route("/")
+  .get(taskController.getMyTasks) // Get all tasks
+  .post(authController.protectRoute, taskController.addTask); // Create new Task
+
+router.get(taskController.getAllTasks); // Get all tasks
 
 router
-    .route("/")
-    .get(taskController.getAllTasks) // Get all tasks
-    .post(authController.protectRoute, taskController.createTask); // Create new Task
-
-router
-    .route("/:id")
-    .get(taskController.getTask) // Get a task by id
-    .patch(taskController.updateTask) // Update a task by id
-    .delete(taskController.deleteTask); // Delete a task by id
+  .route("/:id")
+  .get(taskController.getTask) // Get a task by id
+  .patch(taskController.updateTask) // Update a task by id
+  .delete(taskController.deleteTask); // Delete a task by id
 
 router.patch("/:id/complete", taskController.completeTask); // Mark task as complete
 

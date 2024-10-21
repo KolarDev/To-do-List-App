@@ -1,4 +1,3 @@
-// scheduler/scheduler.js
 const cron = require("node-cron");
 const Email = require("./../utils/email");
 const Task = require("./../models/taskModel"); // Assuming you have a Task model
@@ -15,8 +14,8 @@ const checkAndSendNotifications = async () => {
 
     // Find tasks with deadlines between now and next 24 hours
     const tasks = await Task.find({
-      deadline: { $gte: now, $lte: next24Hours },
-      notified: { $ne: true }, // Assuming you have a 'notified' flag
+      dueDate: { $gte: now, $lte: next24Hours },
+      notified: { $ne: true }, 
     }).populate("user"); // Assuming each task has a 'user' field referencing the User model
 
     // Group tasks by user

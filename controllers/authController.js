@@ -53,13 +53,13 @@ exports.signup = async (req, res) => {
 
 // Logging user in
 exports.login = async (req, res, next) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
-  if (!username || !password) {
+  if (!email || !password) {
     return next(new AppError("Provide your username and password!!", 401));
   }
 
-  const user = await User.findOne({ username }).select("+password");
+  const user = await User.findOne({ email }).select("+password");
 
   if (!user || !(await user.checkPassword(password, user.password))) {
     return next(new AppError("Invalid Credentials!!", 401));

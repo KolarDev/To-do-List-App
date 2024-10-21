@@ -22,23 +22,23 @@ module.exports = class Email {
     });
   }
 
-  async send(text, subject) {
-    // const html = await ejs.renderFile(
-    //   `${__dirname}/../views/emails/${template}.ejs`,
-    //   {
-    //     user: this.user,
-    //     url: this.url,
-    //     subject,
-    //     task: this.task,
-    //   }
-    // );
+  async send(template, subject) {
+    const html = await ejs.renderFile(
+      `${__dirname}/../views/emails/${template}.ejs`,
+      {
+        user: this.user,
+        url: this.url,
+        subject,
+        task: this.task,
+      }
+    );
 
     const mailOptions = {
       from: this.from,
       to: this.to,
       subject,
-      //   html,
-      text,
+      html,
+      text: htmlToText.convert(html),
     };
 
     await this.newTransport().sendMail(mailOptions);

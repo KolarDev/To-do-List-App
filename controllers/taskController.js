@@ -1,6 +1,48 @@
+const AppError = require("../utils/appError");
 const Task = require("./../models/taskModel");
 const User = require("./../models/userModel");
 const Email = require("./../utils/email");
+
+// Create new Task
+exports.addTask = async (req, res, next) => {
+  // const task = Task.create(req.body);
+
+  const { title, description, dueDate, status, priority, tags, user } =
+    req.body;
+  const task = await Task.create({
+    title,
+    description,
+    dueDate,
+    status,
+    priority,
+    tags,
+    user: req.user._id,
+  }); // user: req.user._id
+
+  // // Optionally, send immediate notification if deadline is within 24 hours
+  // const now = new Date();
+  // const deadlineDate = new Date(dueDate);
+  // const timeDifference = deadlineDate - now;
+
+  // console.log(now);
+  // console.log(deadlineDate);
+
+  // if (timeDifference > 0 && timeDifference <= 60 * 60 * 1000) {
+  //   const user = await User.findById(req.user._id);
+  //   if (user) {
+  //     await new Email(user, undefined, task).send("hi thenmwbnw", "todo list");
+  //   }
+  //   task.notified = true;
+  //   await task.save();
+  // }
+
+  res.status(201).json({
+    status: "success",
+    data: {
+      task,
+    },
+  });
+};
 
 // Get all tasks
 exports.getAllTasks = (req, res, next) => {
@@ -16,43 +58,17 @@ exports.getAllTasks = (req, res, next) => {
   });
 };
 
-// Create new Task
-exports.createTask = async (req, res, next) => {
-  // const task = Task.create(req.body);
+// Get all tasks
+exports.getMyTasks = (req, res, next) => {
+  if (!req.user) return next(new AppError("You need to login!!", 401));
+  const tasks = Task.findById({ user: req.user._id });
 
-  const { title, description, dueDate, status, priority, tags, user } =
-    req.body;
-  const task = await Task.create({
-    title,
-    description,
-    dueDate,
-    status,
-    priority,
-    tags,
-    user: req.user._id,
-  }); // user: req.user._id
+  if (!tasks) next(new AppError("No task found!", 404));
 
-  // Optionally, send immediate notification if deadline is within 24 hours
-  const now = new Date();
-  const deadlineDate = new Date(dueDate);
-  const timeDifference = deadlineDate - now;
-
-  console.log(now);
-  console.log(deadlineDate);
-
-  if (timeDifference > 0 && timeDifference <= 60 * 60 * 1000) {
-    const user = await User.findById(req.user._id);
-    if (user) {
-      await new Email(user, undefined, task).send("hi thenmwbnw", "todo list");
-    }
-    task.notified = true;
-    await task.save();
-  }
-
-  res.status(201).json({
+  res.status(200).json({
     status: "success",
     data: {
-      task,
+      tasks,
     },
   });
 };

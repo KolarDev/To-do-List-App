@@ -2,6 +2,8 @@ const path = require("path");
 const express = require("express");
 const bodyparser = require("body-parser");
 
+const scheduler = require("./utils/scheduler"); ///////////
+
 const usersRouter = require("./routes/userRoutes");
 const taskRouter = require("./routes/taskRoutes");
 
@@ -14,9 +16,10 @@ app.use(bodyparser.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", (req, res) => {
-    res.status(200).json({ message: "Hey there! from the sever side", app: "To-do-List" });
+  res
+    .status(200)
+    .json({ message: "Hey there! from the sever side", app: "To-do-List" });
 });
-
 
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/tasks", taskRouter);
