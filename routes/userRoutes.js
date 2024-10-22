@@ -21,7 +21,8 @@ router.route("/").get(userController.getAllUsers); // Get all Users (Restricted 
 // User Profile routes
 router.use(authController.protectRoute);
 router
-  .route("/me/:id")
+  // .route("/me/:id")
+  .route("/me")
   .get(userController.getMe) // Get User Profile details
   .patch(userController.updateMe) // Update User Profile details
 router.delete("/:id",userController.deleteUser); // Delete User Account

@@ -63,6 +63,8 @@ const protectRoute = async (req, res, next) => {
     req.headers.authorization.startsWith("Bearer ")
   ) {
     token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookie && req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
   // Check if there is no token. which means the user is not logged in
   if (!token) return next(new AppError("Please login to get access!", 401));

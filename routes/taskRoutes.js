@@ -4,12 +4,14 @@ const authController = require("./../controllers/authController");
 
 const router = express.Router();
 
+// Protect all tasks routes
+router.use(authController.protectRoute);
 router
   .route("/")
-  .get(taskController.getMyTasks) // Get all tasks
-  .post(authController.protectRoute, taskController.addTask); // Create new Task
+  .get(taskController.getAllTasks) // Get all tasks
+  .post(taskController.addTask); // Create new Task
 
-router.get(taskController.getAllTasks); // Get all tasks
+router.get("/my-tasks", taskController.getMyTasks); // Get all tasks
 
 router
   .route("/:id")

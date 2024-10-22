@@ -83,6 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
         const data = await response.json();
+        console.log(data); ////
 
         if (response.ok) {
           authStatus.innerText =
@@ -125,13 +126,16 @@ document.addEventListener("DOMContentLoaded", () => {
     // Fetch user info to display greeting
     async function fetchUserInfo() {
       try {
-        const response = await fetch("http://127.0.0.1:9000/api/v1/users", {
+        const response = await fetch("http://127.0.0.1:9000/api/v1/users/me", {
           method: "GET",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",
         });
 
         if (response.ok) {
-          const user = await response.json();
+          const data = await response.json();
+          const user = data.data.user; // Access the 'user' object in 'data'
+          console.log(user);
           greeting.innerText = `Hello, ${user.username}`;
           // Optionally, set profile picture if available
         } else {
@@ -149,10 +153,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // Handle Logout
     logoutBtn.addEventListener("click", async () => {
       try {
-        const response = await fetch("http://127.0.0.1:9000/api/v1/logout", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-        });
+        const response = await fetch(
+          "http://127.0.0.1:9000/api/v1/users/logout",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+          }
+        );
 
         if (response.ok) {
           window.location.href = "index.html";
