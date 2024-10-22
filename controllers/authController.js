@@ -2,37 +2,10 @@ const { promisify } = require("util");
 const User = require("./../models/userModel");
 const AppError = require("./../utils/appError");
 const jwt = require("jsonwebtoken");
-const Email = require("./../utils/email");
-
-const generateToken = (id) => {
-  return jwt.sign({ id: id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
-  });
-};
-
-const sendToken = (user, statusCode, res) => {
-  const token = generateToken(user._id);
-  console.log(token);
-  const cookieOptions = {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
-    ),
-    httpOnly: true,
-  };
-
-  res.cookie("jwt", token, cookieOptions);
-
-  res.status(statusCode).json({
-    status: "success",
-    token,
-    data: {
-      user,
-    },
-  });
-};
+const Email = require("../utils/notificator");
 
 // Registering user account
-exports.signup = async (req, res) => {
+const signup = async (req, res) => {
   const { username, email, password, passwordConfirm, passwordChangedAt } =
     req.body;
 
@@ -44,7 +17,7 @@ exports.signup = async (req, res) => {
     passwordChangedAt,
   });
 
-  console.log(newUser);
+  // console.log(newUser);
 
   sendToken(newUser, 201, res);
 
@@ -52,11 +25,11 @@ exports.signup = async (req, res) => {
 };
 
 // Logging user in
-exports.login = async (req, res, next) => {
+const login = async (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return next(new AppError("Provide your username and password!!", 401));
+    return next(new AppError("Provide your email and password!!", 401));
   }
 
   const user = await User.findOne({ email }).select("+password");
@@ -69,11 +42,11 @@ exports.login = async (req, res, next) => {
 };
 
 // Logout
-exports.logout = (req, res) => {
+const logout = (req, res) => {
   // Token invalidation logic goes here (e.g., using a blacklist)
   res.cookie("jwt", "loggedout", {
     expiresIn: new Date(Date.now() + 10 * 1000),
-    httpOnly: true
+    httpOnly: true,
   });
 
   res.status(200).json({
@@ -82,7 +55,7 @@ exports.logout = (req, res) => {
   });
 };
 
-exports.protectRoute = async (req, res, next) => {
+const protectRoute = async (req, res, next) => {
   // 1. Get the token from the authorization header
   let token;
   if (
@@ -112,7 +85,7 @@ exports.protectRoute = async (req, res, next) => {
 };
 
 // Forgot Password Functionality
-exports.forgotPassword = async (req, res, next) => {
+const forgotPassword = async (req, res, next) => {
   // Get user based on valid email
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
@@ -135,7 +108,7 @@ exports.forgotPassword = async (req, res, next) => {
 };
 
 // Reset Password Functionality after forgot password
-exports.resetPassword = async (req, res, next) => {
+const resetPassword = async (req, res, next) => {
   // 1. Get the user based on the token
   const hashedToken = crypto
     .createHash("sha256")
@@ -163,7 +136,7 @@ exports.resetPassword = async (req, res, next) => {
 };
 
 // Password Update Functionality. Logged in users changing password
-exports.updatePassword = async (req, res, next) => {
+const updatePassword = async (req, res, next) => {
   // 1. Get the logged in user from collection
   const user = await User.findById(req.user.id).select("+password");
 
@@ -179,4 +152,42 @@ exports.updatePassword = async (req, res, next) => {
 
   // 4. Log the user in. Send jwt
   sendToken(user, 200, res);
+};
+
+const generateToken = (id) => {
+  return jwt.sign({ id: id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+};
+
+const sendToken = (user, statusCode, res) => {
+  const token = generateToken(user._id);
+  // console.log(token);
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+  };
+
+  res.cookie("jwt", token, cookieOptions);
+
+  res.status(statusCode).json({
+    status: "success",
+    token,
+    data: {
+      user,
+    },
+  });
+};
+
+module.exports = {
+  signup,
+  login,
+  logout,
+  protectRoute,
+  forgotPassword,
+  resetPassword,
+  updatePassword,
+  sendToken,
 };

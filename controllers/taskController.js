@@ -1,7 +1,7 @@
 const AppError = require("../utils/appError");
 const Task = require("./../models/taskModel");
 const User = require("./../models/userModel");
-const Email = require("./../utils/email");
+const Email = require("../utils/notificator");
 
 // Create new Task
 exports.addTask = async (req, res, next) => {

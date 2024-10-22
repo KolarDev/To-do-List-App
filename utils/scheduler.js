@@ -1,5 +1,5 @@
 const cron = require("node-cron");
-const Email = require("./../utils/email");
+const Email = require("./notificator");
 const Task = require("./../models/taskModel"); // Assuming you have a Task model
 const User = require("./../models/userModel"); // Assuming you have a User model
 
@@ -15,7 +15,7 @@ const checkAndSendNotifications = async () => {
     // Find tasks with deadlines between now and next 24 hours
     const tasks = await Task.find({
       dueDate: { $gte: now, $lte: next24Hours },
-      notified: { $ne: true }, 
+      notified: { $ne: true },
     }).populate("user"); // Assuming each task has a 'user' field referencing the User model
 
     // Group tasks by user

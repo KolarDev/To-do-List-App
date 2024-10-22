@@ -7,7 +7,7 @@ const router = express.Router();
 // 1. Registration and login
 router.post("/signup", authController.signup); // User Registration
 router.post("/login", authController.login); // User Login
-router.post("/logout", authController.logout); // User Login
+router.post("/logout", authController.protectRoute, authController.logout); // User Logout
 
 // 2. Password Management
 router
@@ -21,9 +21,9 @@ router.route("/").get(userController.getAllUsers); // Get all Users (Restricted 
 // User Profile routes
 router.use(authController.protectRoute);
 router
-  .route("/profile/:id")
-  .get(userController.userProfile) // Get User Profile details
-  .patch(userController.updateProfile) // Update User Profile details
-  .delete(userController.deleteUser); // Delete User Account
+  .route("/me/:id")
+  .get(userController.getMe) // Get User Profile details
+  .patch(userController.updateMe) // Update User Profile details
+router.delete("/:id",userController.deleteUser); // Delete User Account
 
 module.exports = router;
