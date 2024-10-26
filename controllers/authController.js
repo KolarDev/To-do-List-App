@@ -82,6 +82,7 @@ const protectRoute = async (req, res, next) => {
 
   // 4. Save the confirm user in as req.user for use in the protected route.
   req.user = confirmUser;
+  res.locals.user = confirmUser;
   // Road clear!! Move on...
   next();
 };

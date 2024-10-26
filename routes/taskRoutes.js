@@ -6,10 +6,8 @@ const router = express.Router();
 
 // Protect all tasks routes
 router.use(authController.protectRoute);
-router
-  .route("/")
-  .get(taskController.getAllTasks) // Get all tasks
-  .post(taskController.addTask); // Create new Task
+router.route("/").get(taskController.getAllTasks); // Get all tasks
+router.post("/add-task", taskController.addTask); // Create new Task
 
 router.get("/my-tasks", taskController.getMyTasks); // Get all tasks
 

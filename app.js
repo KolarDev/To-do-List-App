@@ -9,6 +9,7 @@ const scheduler = require("./utils/scheduler"); ///////////
 
 const usersRouter = require("./routes/userRoutes");
 const taskRouter = require("./routes/taskRoutes");
+const viewRouter = require("./routes/viewRoutes");
 
 const app = express();
 
@@ -18,7 +19,6 @@ app.use(
     credentials: true, // Allow cookies to be sent
   })
 );
-
 
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "views"));
@@ -36,13 +36,15 @@ app.use(bodyparser.json());
 // Serving Static Files
 app.use(express.static(path.join(__dirname, "public")));
 
-app.get("/", (req, res) => {
-  res
-    .status(200)
-    .json({ message: "Hey there! from the sever side", app: "To-do-List" });
-});
-
+// app.get("/", (req, res) => {
+//   res.json({
+//     message: "Hey there! from the sever side",
+//     app: "To-do-List"
+//   });
+// });
+app.use("/", viewRouter);
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/tasks", taskRouter);
+
 
 module.exports = app;
