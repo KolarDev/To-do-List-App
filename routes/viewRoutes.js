@@ -1,6 +1,7 @@
 const express = require("express");
 const Task = require("./../models/taskModel");
 const User = require("./../models/userModel");
+const authController = require("./../controllers/authController");
 
 const router = express.Router();
 
@@ -8,12 +9,14 @@ router.get("/", (req, res) => {
   res.status(200).render("auth");
 });
 
-router.get("/main", (req, res) => {
-  const tasks = Task.find();
+router.get("/main", authController.protectRoute, async (req, res) => {
+  const userId = req.user._id;
+  const tasks = await Task.find({ user: userId });
+  const user = await User.findById(userId);
 
   res.status(200).render("main", {
     tasks,
-    username: req.user.username,
+    username: user.username,
   });
 });
 

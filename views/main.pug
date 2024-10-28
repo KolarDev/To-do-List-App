@@ -53,6 +53,20 @@ block content
             th Delete
         tbody
           // Tasks will be dynamically inserted here
+          each task in tasks
+            tr
+              td #{task.title}
+              td #{task.description}
+              td #{new Date(task.dueDate).toLocaleDateString()}
+              td #{task.status}
+              td #{task.priority}
+              td 
+                button(onclick=`editTask(${task.id})`) Edit
+              td 
+                button(onclick=`deleteTask(${task.id})`) Delete
+          if tasks.length === 0
+            tr
+              td(colspan='5') No tasks available.
 
   // Footer Component
   include components/footer

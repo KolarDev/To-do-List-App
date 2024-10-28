@@ -36,6 +36,8 @@ app.use(bodyparser.json());
 // Serving Static Files
 app.use(express.static(path.join(__dirname, "public")));
 
+app.use(cookieParser());
+
 // app.get("/", (req, res) => {
 //   res.json({
 //     message: "Hey there! from the sever side",
@@ -45,6 +47,5 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", viewRouter);
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/tasks", taskRouter);
-
 
 module.exports = app;
