@@ -69,23 +69,30 @@ exports.getTask = (req, res, next) => {
 
 // Update a task by title
 exports.updateTask = async (req, res, next) => {
-  const task = await Task.findOneAndUpdate(req.params.id);
+  const { taskId } = req.params.id;
+  const { title, description, dueDate, status, priority } = req.body;
 
-  if (!task) next(new AppError("No task with that name!", 404));
+  const updatedTask = await Task.findByIdAndUpdate(
+    taskId,
+    { title, description, dueDate, status, priority },
+    { new: true } // This option returns the updated document
+  );
+
+  if (!updatedTask) next(new AppError("No task with that name!", 404));
 
   res.status(200).json({
     status: "success",
     data: {
-      task,
+      updatedTask,
     },
   });
 };
 
 // Delete a task by title
 exports.deleteTask = async (req, res, next) => {
-  const task = await Task.findOneAndDelete(req.params.id);
+  const task = await Task.findByIdAndDelete(req.params.id);
 
-  if (!task) next(new AppError("No task with that name!", 404));
+  if (!task) next(new AppError("No task with that id!", 404));
 
   res.status(204).json({
     status: "success",

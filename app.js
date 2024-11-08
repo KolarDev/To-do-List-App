@@ -13,12 +13,12 @@ const viewRouter = require("./routes/viewRoutes");
 
 const app = express();
 
-app.use(
-  cors({
-    origin: "http://127.0.0.1:5500", // frontend URL
-    credentials: true, // Allow cookies to be sent
-  })
-);
+// app.use(
+//   cors({
+//     origin: "http://127.0.0.1:5500", // frontend URL
+//     credentials: true, // Allow cookies to be sent
+//   })
+// );
 
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "views"));

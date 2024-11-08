@@ -14,7 +14,7 @@ router.get("/my-tasks", taskController.getMyTasks); // Get all tasks
 router
   .route("/:id")
   .get(taskController.getTask) // Get a task by id
-  .patch(taskController.updateTask) // Update a task by id
+  .put(taskController.updateTask) // Update a task by id
   .delete(taskController.deleteTask); // Delete a task by id
 
 router.patch("/:id/complete", taskController.completeTask); // Mark task as complete
