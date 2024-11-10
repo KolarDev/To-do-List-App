@@ -1,12 +1,5 @@
 import AppError from "../utils/appError";
-import {
-  create,
-  find,
-  findById,
-  findByIdAndUpdate,
-  findByIdAndDelete,
-  findOne,
-} from "./../models/taskModel";
+import { Task } from "./../models/taskModel";
 import User from "./../models/userModel";
 import Email from "../utils/notificator";
 
@@ -15,7 +8,7 @@ const addTask = async (req, res, next) => {
   // const task = Task.create(req.body);
 
   const { title, description, dueDate, status, priority, user } = req.body;
-  const task = await create({
+  const task = await Task.create({
     title,
     description,
     dueDate,
@@ -34,7 +27,7 @@ const addTask = async (req, res, next) => {
 
 // Get all tasks
 const getAllTasks = (req, res, next) => {
-  const tasks = find();
+  const tasks = Task.find();
 
   if (!tasks) next(new AppError("No task found!", 404));
 
@@ -48,7 +41,7 @@ const getAllTasks = (req, res, next) => {
 
 // Get all tasks
 const getMyTasks = (req, res, next) => {
-  const tasks = findById({ user: req.user._id });
+  const tasks = Task.findById({ user: req.user._id });
 
   if (!tasks) next(new AppError("No task found!", 404));
 
@@ -62,7 +55,7 @@ const getMyTasks = (req, res, next) => {
 
 // Get a task by title
 const getTask = (req, res, next) => {
-  const task = findById(req.params.id);
+  const task = Task.findById(req.params.id);
 
   if (!task) next(new AppError("No task with that name!", 404));
 
@@ -79,7 +72,7 @@ const updateTask = async (req, res, next) => {
   const { taskId } = req.params.id;
   const { title, description, dueDate, status, priority } = req.body;
 
-  const updatedTask = await findByIdAndUpdate(
+  const updatedTask = await Task.findByIdAndUpdate(
     taskId,
     { title, description, dueDate, status, priority },
     { new: true } // This option returns the updated document
@@ -97,7 +90,7 @@ const updateTask = async (req, res, next) => {
 
 // Delete a task by title
 const deleteTask = async (req, res, next) => {
-  const task = await findByIdAndDelete(req.params.id);
+  const task = await Task.findByIdAndDelete(req.params.id);
 
   if (!task) next(new AppError("No task with that id!", 404));
 
@@ -111,7 +104,7 @@ const deleteTask = async (req, res, next) => {
 
 // Mark task as complete
 const completeTask = async (req, res, next) => {
-  const task = await findOne(req.params.id);
+  const task = await Task.findOne(req.params.id);
 
   if (!task) next(new AppError("No task with that name!", 404));
 
@@ -128,7 +121,7 @@ const completeTask = async (req, res, next) => {
 
 // Get completed tasks
 const completedTasks = async (req, res, next) => {
-  const tasks = await find({ status: "completed" });
+  const tasks = await Task.find({ status: "completed" });
 
   if (!tasks) next(new AppError("You have no completed task", 404));
 
@@ -148,5 +141,5 @@ export {
   updateTask,
   deleteTask,
   completeTask,
-  completedTasks
+  completedTasks,
 };

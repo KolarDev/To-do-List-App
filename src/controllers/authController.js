@@ -1,5 +1,5 @@
 import { promisify } from "util";
-import { create, findOne, findById } from "./../models/userModel";
+import { User } from "./../models/userModel";
 import AppError from "./../utils/appError";
 import { verify, sign } from "jsonwebtoken";
 import Email from "../utils/notificator";
@@ -9,7 +9,7 @@ const signup = async (req, res) => {
   const { username, email, password, passwordConfirm, passwordChangedAt } =
     req.body;
 
-  const newUser = await create({
+  const newUser = await User.create({
     username,
     email,
     password,
@@ -32,7 +32,7 @@ const login = async (req, res, next) => {
     return next(new AppError("Provide your email and password!!", 401));
   }
 
-  const user = await findOne({ email }).select("+password");
+  const user = await User.findOne({ email }).select("+password");
 
   if (!user || !(await user.checkPassword(password, user.password))) {
     return next(new AppError("Invalid Credentials!!", 401));
@@ -73,7 +73,7 @@ const protectRoute = async (req, res, next) => {
   const decoded = await promisify(verify)(token, process.env.JWT_SECRET);
 
   // 3. Check if user still exists
-  const confirmUser = await findById(decoded.id);
+  const confirmUser = await User.findById(decoded.id);
   if (!confirmUser) {
     return next(
       new AppError("Authentication Failed!, Try logging in again", 401)
@@ -90,7 +90,7 @@ const protectRoute = async (req, res, next) => {
 // Forgot Password Functionality
 const forgotPassword = async (req, res, next) => {
   // Get user based on valid email
-  const user = await findOne({ email: req.body.email });
+  const user = await User.findOne({ email: req.body.email });
   if (!user) {
     return next(new AppError("No user with this email !", 404));
   }
@@ -117,7 +117,7 @@ const resetPassword = async (req, res, next) => {
     .createHash("sha256")
     .update(req.params.token)
     .digest("hex");
-  const user = await findOne({
+  const user = await User.findOne({
     passwordResetToken: hashedToken,
     passwordResetExpires: { $gt: Date.now() },
   });
@@ -141,7 +141,7 @@ const resetPassword = async (req, res, next) => {
 // Password Update Functionality. Logged in users changing password
 const updatePassword = async (req, res, next) => {
   // 1. Get the logged in user from collection
-  const user = await findById(req.user.id).select("+password");
+  const user = await User.findById(req.user.id).select("+password");
 
   // 2. Check if the user's current password is correct
   if (!(await user.checkPassword(req.body.passwordCurrent, user.password))) {

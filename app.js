@@ -5,7 +5,7 @@ const cookieParser = require("cookie-parser");
 const bodyparser = require("body-parser");
 const morgan = require("morgan");
 
-const scheduler = require("./utils/scheduler"); ///////////
+const scheduler = require("./src/utils/scheduler"); ///////////
 
 const usersRouter = require("./routes/userRoutes");
 const taskRouter = require("./routes/taskRoutes");
