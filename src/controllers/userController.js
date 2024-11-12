@@ -1,5 +1,5 @@
 const User = require("./../models/userModel");
-import AppError from "../utils/appError";
+const AppError = require("../utils/appError");
 
 // Get all Users
 const getAllUsers = async (req, res, next) => {

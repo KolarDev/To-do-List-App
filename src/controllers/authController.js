@@ -1,8 +1,8 @@
-import { promisify } from "util";
-import { User } from "./../models/userModel";
-import AppError from "./../utils/appError";
-import { verify, sign } from "jsonwebtoken";
-import Email from "../utils/notificator";
+const { promisify } = require("util");
+const User = require("./../models/userModel");
+const AppError = require("./../utils/appError");
+const jwt = require("jsonwebtoken");
+const Email = require("../utils/notificator");
 
 // Registering user account
 const signup = async (req, res) => {
@@ -70,7 +70,7 @@ const protectRoute = async (req, res, next) => {
   if (!token) return next(new AppError("Please login to get access!", 401));
 
   // 2. Verifying the token. Server verifies by test signature
-  const decoded = await promisify(verify)(token, process.env.JWT_SECRET);
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
   // 3. Check if user still exists
   const confirmUser = await User.findById(decoded.id);
@@ -158,7 +158,7 @@ const updatePassword = async (req, res, next) => {
 };
 
 const generateToken = (id) => {
-  return sign({ id: id }, process.env.JWT_SECRET, {
+  return jwt.sign({ id: id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
