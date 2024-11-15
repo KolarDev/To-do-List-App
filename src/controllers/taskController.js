@@ -1,7 +1,7 @@
-import AppError from "../utils/appError";
-import { Task } from "./../models/taskModel";
-import User from "./../models/userModel";
-import Email from "../utils/notificator";
+const AppError = require("../utils/appError");
+const Task = require("./../models/taskModel");
+const User = require("./../models/userModel");
+const Email = require("../utils/notificator");
 
 // Create new Task
 const addTask = async (req, res, next) => {
