@@ -183,6 +183,38 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 });
+
+function editTask(taskId) {
+  // Fetch task details from the backend (optional) or frontend storage
+  const taskRow = document
+    .querySelector(`button[onclick='editTask(${taskId})']`)
+    .closest("tr");
+
+  // Get task details from the table row (if stored in frontend)
+  const title = taskRow.children[0].textContent.trim();
+  const description = taskRow.children[1].textContent.trim();
+  const dueDate = taskRow.children[2].textContent.trim();
+  const status = taskRow.children[3].textContent.trim();
+  const priority = taskRow.children[4].textContent.trim();
+
+  // Populate the modal inputs
+  document.getElementById("edit-task-id").value = taskId;
+  document.getElementById("edit-task-title").value = title;
+  document.getElementById("edit-task-desc").value = description;
+  document.getElementById("edit-task-duedate").value = dueDate;
+  document.getElementById("edit-task-status").value = status;
+  document.getElementById("edit-task-priority").value = priority;
+
+  // Show the modal
+  const modal = document.getElementById("edit-modal");
+  modal.classList.remove("hidden");
+}
+
+// Close modal function
+document.querySelector(".close-button").addEventListener("click", () => {
+  document.getElementById("edit-modal").classList.add("hidden");
+});
+
 //   /* --------------------- Main Page Logic --------------------- */
 //   if (window.location.pathname.endsWith("main")) {
 //     const logoutBtn = document.getElementById("logout-btn");
