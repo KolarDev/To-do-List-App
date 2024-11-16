@@ -8,6 +8,7 @@ const addTask = async (req, res, next) => {
   // const task = Task.create(req.body);
 
   const { title, description, dueDate, status, priority, user } = req.body;
+
   const task = await Task.create({
     title,
     description,
