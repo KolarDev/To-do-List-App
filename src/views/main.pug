@@ -1,0 +1,113 @@
+extends layout
+
+block content
+  // Header Component
+  include components/header
+
+  // Main Content
+  main
+    // Add Task Form
+    section#add-task-section
+      h3 Add New Task
+      form#add-task-form
+        table
+          tr
+            th Title
+            th Description
+            th Due Date
+            th Status
+            th Priority
+            th(colspan="2") Actions
+          tr
+            td
+              input(type="text", id="task-title", required)
+            td
+              input(type="text", id="task-desc", required)
+            td
+              input(type="date", id="task-duedate", required)
+            td
+              select(id="task-status")
+                option(value="Pending") Pending
+                option(value="In Progress") In Progress
+                option(value="Completed") Completed
+            td
+              select(id="task-priority")
+                option(value="Low") Low
+                option(value="Medium") Medium
+                option(value="High") High
+            td(colspan="2")
+              button(type="submit") Add Task
+
+    // Tasks Display Section
+    section#tasks-section
+      h3 Your Tasks
+      table#tasks-table
+        thead
+          tr
+            th Title
+            th Description
+            th Due Date
+            th Status
+            th Pr iority
+            th Update
+            th Delete
+        tbody
+          // Tasks will be dynamically inserted here
+          each task in tasks
+            tr
+              td(contenteditable="true") #{task.title}
+              td(contenteditable="true") #{task.description}
+              td(contenteditable="true") #{new Date(task.dueDate).toLocaleDateString()}
+              td(contenteditable="true") #{task.status}
+              td(contenteditable="true") #{task.priority}
+              td 
+                button(onclick=`editTask(${task.id})`) Edit
+              td 
+                button(onclick=`deleteTask(${task.id})`) Delete
+          if tasks.length === 0
+            tr
+              td(colspan='5') No tasks available.
+
+  // Footer Component
+  include components/footer
+
+  // Edit Task Modal
+  div#edit-modal.modal.hidden
+    .modal-content
+      span.close-button &times;
+      h2 Edit Task
+      form#edit-task-form
+        input(type="hidden", id="edit-task-id")
+        table
+          tr
+            td Title:
+            td
+              input(type="text", id="edit-task-title", required)
+          tr
+            td Description:
+            td
+              input(type="text", id="edit-task-desc", required)
+          tr
+            td Due Date:
+            td
+              input(type="date", id="edit-task-duedate", required)
+          tr
+            td Status:
+            td
+              select(id="edit-task-status", required)
+                option(value="Pending") Pending
+                option(value="In Progress") In Progress
+                option(value="Completed") Completed
+          tr
+            td Priority:
+            td
+              select(id="edit-task-priority", required)
+                option(value="Low") Low
+                option(value="Medium") Medium
+                option(value="High") High
+          tr
+            td(colspan="2")
+              button(type="submit") Update Task
+
+  // Status Messages
+  div#main-status
