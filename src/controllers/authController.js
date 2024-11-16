@@ -184,7 +184,7 @@ const sendToken = (user, statusCode, res) => {
   });
 };
 
-export default {
+module.exports = {
   signup,
   login,
   logout,

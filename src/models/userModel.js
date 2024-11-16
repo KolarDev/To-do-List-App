@@ -3,8 +3,6 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 
-delete mongoose.connection.models["User"];
-
 const userSchema = new mongoose.Schema(
   {
     username: {

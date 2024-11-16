@@ -134,7 +134,7 @@ const completedTasks = async (req, res, next) => {
   });
 };
 
-export {
+module.exports = {
   addTask,
   getAllTasks,
   getMyTasks,

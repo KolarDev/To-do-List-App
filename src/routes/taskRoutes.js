@@ -1,6 +1,15 @@
-import { Router } from "express";
-import { getAllTasks, addTask, getMyTasks, getTask, updateTask, deleteTask, completeTask, completedTasks } from "./../controllers/taskController";
-import { protectRoute } from "./../controllers/authController";
+const { Router } = require("express");
+const {
+  getAllTasks,
+  addTask,
+  getMyTasks,
+  getTask,
+  updateTask,
+  deleteTask,
+  completeTask,
+  completedTasks,
+} = require("./../controllers/taskController");
+const { protectRoute } = require("./../controllers/authController");
 
 const router = Router();
 
@@ -21,4 +30,4 @@ router.patch("/:id/complete", completeTask); // Mark task as complete
 
 router.get("/completed", completedTasks); // Get completed tasks
 
-export default router;
+module.exports = router;
