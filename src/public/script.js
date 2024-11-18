@@ -106,114 +106,297 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // -------------------MAIN------------------------------
   if (window.location.pathname.endsWith("main")) {
+    console.log("Main page logic running");
     // document.addEventListener("DOMContentLoaded", () => {
     // Fetch all "Edit" and "Delete" buttons dynamically
-    document
-      .querySelectorAll("button[onclick^='editTask']")
-      .forEach((button) => {
-        button.addEventListener("click", (event) => {
-          const taskRow = event.target.closest("tr");
-          const taskId = getTaskId(event.target);
-          editTask(taskId, taskRow);
-        });
-      });
 
-    document
-      .querySelectorAll("button[onclick^='deleteTask']")
-      .forEach((button) => {
-        button.addEventListener("click", (event) => {
-          const taskId = getTaskId(event.target);
-          deleteTask(taskId);
-        });
-      });
-    //});
+    // Status message container
+    const mainStatus = document.getElementById("main-status");
 
-    // Helper function to get task ID
-    function getTaskId(button) {
-      return button.getAttribute("onclick").match(/\d+/)[0];
+    // Utility to show status messages
+    function showStatus(message, isSuccess = true) {
+      mainStatus.textContent = message;
+      mainStatus.className = isSuccess ? "success" : "error";
+      setTimeout(() => (mainStatus.textContent = ""), 3000);
     }
 
-    // Edit Task function - save changes from contenteditable cells
-    function editTask(taskId, taskRow) {
-      // Gather updated values from each contenteditable cell
-      const updatedTask = {
-        title: taskRow.cells[0].textContent,
-        description: taskRow.cells[1].textContent,
-        dueDate: new Date(taskRow.cells[2].textContent).toISOString(),
-        status: taskRow.cells[3].textContent,
-        priority: taskRow.cells[4].textContent,
-      };
+    // ---------------- Add Task ---------------- //
+    const addTaskForm = document.getElementById("add-task-form");
+    const tasksTableBody = document.querySelector("#tasks-table tbody");
 
-      // Example of sending updates to the server (use your actual API endpoint)
-      fetch(`http://127.0.0.1:9000/api/v1/tasks/${taskId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedTask),
-      })
-        .then((response) => {
-          if (response.status === 200) {
-            alert("Task updated successfully!");
+    if (addTaskForm) {
+      addTaskForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const newTask = {
+          title: document.getElementById("task-title").value.trim(),
+          description: document.getElementById("task-desc").value.trim(),
+          dueDate: document.getElementById("task-duedate").value,
+          status: document.getElementById("task-status").value,
+          priority: document.getElementById("task-priority").value,
+        };
+
+        try {
+          const response = await fetch(
+            "http://127.0.0.1:9000/api/v1/tasks/add-task",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(newTask),
+            }
+          );
+
+          if (response.ok) {
+            const savedTask = await response.json().data;
+            console.log(savedTask);
+            // Dynamically add the new task to the table
+            addTaskRow(savedTask);
+            addTaskForm.reset();
+            showStatus("Task added successfully!");
           } else {
-            alert("Failed to update task.");
+            const error = await response.json();
+            showStatus(error.message || "Failed to add task.", false);
           }
-        })
-        .catch((error) => console.error("Error:", error));
+        } catch (error) {
+          console.error("Add Task Error:", error);
+          showStatus("An error occurred. Please try again.", false);
+        }
+      });
     }
 
-    // Delete Task function
-    function deleteTask(taskId) {
-      fetch(`http://127.0.0.1:9000/api/v1/tasks/${taskId}`, {
-        method: "DELETE",
-      })
-        .then((response) => {
-          if (response.status === 204) {
-            // If the deletion was successful, remove the task row from the table
-            document
-              .querySelector(`button[onclick='deleteTask(${taskId})']`)
-              .closest("tr")
-              .remove();
-            alert("Task deleted successfully!");
-          } else {
-            alert("Failed to delete task.");
-          }
-        })
-        .catch((error) => console.error("Error:", error));
+    // Add a row to the tasks table dynamically
+    function addTaskRow(task) {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+      <td contenteditable="true">${task.title}</td>
+      <td contenteditable="true">${task.description}</td>
+      <td contenteditable="true">${new Date(
+        task.dueDate
+      ).toLocaleDateString()}</td>
+      <td contenteditable="true">${task.status}</td>
+      <td contenteditable="true">${task.priority}</td>
+      <td><button onclick="editTask(${task.id})">Edit</button></td>
+      <td><button onclick="deleteTask(${task.id})">Delete</button></td>
+    `;
+      tasksTableBody.appendChild(row);
     }
+
+    // ---------------- Edit Task ---------------- //
+    const editModal = document.getElementById("edit-modal");
+    const editTaskForm = document.getElementById("edit-task-form");
+
+    window.editTask = async function (taskId) {
+      const taskRow = document
+        .querySelector(`button[onclick='editTask(${taskId})']`)
+        .closest("tr");
+
+      // Populate the modal inputs
+      document.getElementById("edit-task-id").value = taskId;
+      document.getElementById("edit-task-title").value =
+        taskRow.cells[0].textContent.trim();
+      document.getElementById("edit-task-desc").value =
+        taskRow.cells[1].textContent.trim();
+      document.getElementById("edit-task-duedate").value = new Date(
+        taskRow.cells[2].textContent
+      )
+        .toISOString()
+        .split("T")[0];
+      document.getElementById("edit-task-status").value =
+        taskRow.cells[3].textContent.trim();
+      document.getElementById("edit-task-priority").value =
+        taskRow.cells[4].textContent.trim();
+
+      editModal.classList.remove("hidden");
+    };
+
+    // Close modal
+    document.querySelector(".close-button").addEventListener("click", () => {
+      editModal.classList.add("hidden");
+    });
+
+    if (editTaskForm) {
+      editTaskForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const updatedTask = {
+          title: document.getElementById("edit-task-title").value.trim(),
+          description: document.getElementById("edit-task-desc").value.trim(),
+          dueDate: document.getElementById("edit-task-duedate").value,
+          status: document.getElementById("edit-task-status").value,
+          priority: document.getElementById("edit-task-priority").value,
+        };
+
+        const taskId = document.getElementById("edit-task-id").value;
+
+        try {
+          const response = await fetch(
+            `http://127.0.0.1:9000/api/v1/tasks/${taskId}`,
+            {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(updatedTask),
+            }
+          );
+
+          if (response.ok) {
+            // Update the task row in the table
+            const taskRow = document
+              .querySelector(`button[onclick='editTask(${taskId})']`)
+              .closest("tr");
+            taskRow.cells[0].textContent = updatedTask.title;
+            taskRow.cells[1].textContent = updatedTask.description;
+            taskRow.cells[2].textContent = new Date(
+              updatedTask.dueDate
+            ).toLocaleDateString();
+            taskRow.cells[3].textContent = updatedTask.status;
+            taskRow.cells[4].textContent = updatedTask.priority;
+
+            editModal.classList.add("hidden");
+            showStatus("Task updated successfully!");
+          } else {
+            const error = await response.json();
+            showStatus(error.message || "Failed to update task.", false);
+          }
+        } catch (error) {
+          console.error("Edit Task Error:", error);
+          showStatus("An error occurred. Please try again.", false);
+        }
+      });
+    }
+
+    // ---------------- Delete Task ---------------- //
+    window.deleteTask = async function (taskId) {
+      try {
+        const response = await fetch(
+          `http://127.0.0.1:9000/api/v1/tasks/${taskId}`,
+          {
+            method: "DELETE",
+          }
+        );
+
+        if (response.ok) {
+          // Remove the task row from the table
+          document
+            .querySelector(`button[onclick='deleteTask(${taskId})']`)
+            .closest("tr")
+            .remove();
+          showStatus("Task deleted successfully!");
+        } else {
+          const error = await response.json();
+          showStatus(error.message || "Failed to delete task.", false);
+        }
+      } catch (error) {
+        console.error("Delete Task Error:", error);
+        showStatus("An error occurred. Please try again.", false);
+      }
+    };
   }
+  //   document
+  //     .querySelectorAll("button[onclick^='editTask']")
+  //     .forEach((button) => {
+  //       button.addEventListener("click", (event) => {
+  //         const taskRow = event.target.closest("tr");
+  //         const taskId = getTaskId(event.target);
+  //         editTask(taskId, taskRow);
+  //       });
+  //     });
+
+  //   document
+  //     .querySelectorAll("button[onclick^='deleteTask']")
+  //     .forEach((button) => {
+  //       button.addEventListener("click", (event) => {
+  //         const taskId = getTaskId(event.target);
+  //         deleteTask(taskId);
+  //       });
+  //     });
+  //   //});
+
+  //   // Helper function to get task ID
+  //   function getTaskId(button) {
+  //     return button.getAttribute("onclick").match(/\d+/)[0];
+  //   }
+
+  //   // Edit Task function - save changes from contenteditable cells
+  //   function editTask(taskId, taskRow) {
+  //     // Gather updated values from each contenteditable cell
+  //     const updatedTask = {
+  //       title: taskRow.cells[0].textContent,
+  //       description: taskRow.cells[1].textContent,
+  //       dueDate: new Date(taskRow.cells[2].textContent).toISOString(),
+  //       status: taskRow.cells[3].textContent,
+  //       priority: taskRow.cells[4].textContent,
+  //     };
+
+  //     // Example of sending updates to the server (use your actual API endpoint)
+  //     fetch(`http://127.0.0.1:9000/api/v1/tasks/${taskId}`, {
+  //       method: "PUT",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(updatedTask),
+  //     })
+  //       .then((response) => {
+  //         if (response.status === 200) {
+  //           alert("Task updated successfully!");
+  //         } else {
+  //           alert("Failed to update task.");
+  //         }
+  //       })
+  //       .catch((error) => console.error("Error:", error));
+  //   }
+
+  //   // Delete Task function
+  //   function deleteTask(taskId) {
+  //     fetch(`http://127.0.0.1:9000/api/v1/tasks/${taskId}`, {
+  //       method: "DELETE",
+  //     })
+  //       .then((response) => {
+  //         if (response.status === 204) {
+  //           // If the deletion was successful, remove the task row from the table
+  //           document
+  //             .querySelector(`button[onclick='deleteTask(${taskId})']`)
+  //             .closest("tr")
+  //             .remove();
+  //           alert("Task deleted successfully!");
+  //         } else {
+  //           alert("Failed to delete task.");
+  //         }
+  //       })
+  //       .catch((error) => console.error("Error:", error));
+  //   }
+  // }
 });
 
-function editTask(taskId) {
-  // Fetch task details from the backend (optional) or frontend storage
-  const taskRow = document
-    .querySelector(`button[onclick='editTask(${taskId})']`)
-    .closest("tr");
+// function editTask(taskId) {
+//   // Fetch task details from the backend (optional) or frontend storage
+//   const taskRow = document
+//     .querySelector(`button[onclick='editTask(${taskId})']`)
+//     .closest("tr");
 
-  // Get task details from the table row (if stored in frontend)
-  const title = taskRow.children[0].textContent.trim();
-  const description = taskRow.children[1].textContent.trim();
-  const dueDate = taskRow.children[2].textContent.trim();
-  const status = taskRow.children[3].textContent.trim();
-  const priority = taskRow.children[4].textContent.trim();
+//   // Get task details from the table row (if stored in frontend)
+//   const title = taskRow.children[0].textContent.trim();
+//   const description = taskRow.children[1].textContent.trim();
+//   const dueDate = taskRow.children[2].textContent.trim();
+//   const status = taskRow.children[3].textContent.trim();
+//   const priority = taskRow.children[4].textContent.trim();
 
-  // Populate the modal inputs
-  document.getElementById("edit-task-id").value = taskId;
-  document.getElementById("edit-task-title").value = title;
-  document.getElementById("edit-task-desc").value = description;
-  document.getElementById("edit-task-duedate").value = dueDate;
-  document.getElementById("edit-task-status").value = status;
-  document.getElementById("edit-task-priority").value = priority;
+//   // Populate the modal inputs
+//   document.getElementById("edit-task-id").value = taskId;
+//   document.getElementById("edit-task-title").value = title;
+//   document.getElementById("edit-task-desc").value = description;
+//   document.getElementById("edit-task-duedate").value = dueDate;
+//   document.getElementById("edit-task-status").value = status;
+//   document.getElementById("edit-task-priority").value = priority;
 
-  // Show the modal
-  const modal = document.getElementById("edit-modal");
-  modal.classList.remove("hidden");
-}
+//   // Show the modal
+//   const modal = document.getElementById("edit-modal");
+//   modal.classList.remove("hidden");
+// }
 
-// Close modal function
-document.querySelector(".close-button").addEventListener("click", () => {
-  document.getElementById("edit-modal").classList.add("hidden");
-});
+// // Close modal function
+// document.querySelector(".close-button").addEventListener("click", () => {
+//   document.getElementById("edit-modal").classList.add("hidden");
+// });
 
 //   /* --------------------- Main Page Logic --------------------- */
 //   if (window.location.pathname.endsWith("main")) {
