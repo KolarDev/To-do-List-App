@@ -15,10 +15,10 @@ const router = Router();
 
 // Protect all tasks routes
 router.use(protectRoute);
-router.route("/").get(getAllTasks); // Get all tasks
+router.route("/all-tasks").get(getAllTasks); // Get all tasks
 router.post("/add-task", addTask); // Create new Task
 
-router.get("/my-tasks", getMyTasks); // Get all tasks
+router.get("/", getMyTasks); // Get my tasks
 
 router
   .route("/:id")

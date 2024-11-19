@@ -22,7 +22,6 @@ const app = express();
 
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "views"));
-
 // Serving Static Files
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -33,9 +32,6 @@ app.use(cookieParser()); // Use cookie-parser to handle cookies
 app.use(morgan("dev"));
 
 app.use(bodyparser.json());
-
-// Serving Static Files
-app.use(express.static(path.join(__dirname, "public")));
 
 app.use(cookieParser());
 
