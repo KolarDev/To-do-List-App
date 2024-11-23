@@ -37,6 +37,9 @@ block content
                 option(value="High") High
             td(colspan="2")
               button(type="submit") Add Task
+  
+  // Status Messages
+  div#main-status
 
     // Tasks Display Section
     section#tasks-section
@@ -48,11 +51,25 @@ block content
             th Description
             th Due Date
             th Status
-            th Priority
+            th Pr iority
             th Update
             th Delete
         tbody
           // Tasks will be dynamically inserted here
+          each task in tasks
+            tr
+              td(contenteditable="true") #{task.title}
+              td(contenteditable="true") #{task.description}
+              td(contenteditable="true") #{new Date(task.dueDate).toLocaleDateString()}
+              td(contenteditable="true") #{task.status}
+              td(contenteditable="true") #{task.priority}
+              td 
+                button(onclick=`editTask(${task._id})`) Edit
+              td 
+                button(onclick=`deleteTask(${task._id})`) Delete
+          if tasks.length === 0
+            tr
+              td(colspan='5') No tasks available.
 
   // Footer Component
   include components/footer
@@ -95,6 +112,5 @@ block content
             td(colspan="2")
               button(type="submit") Update Task
 
-  // Status Messages
-  div#main-status
-
+block scripts
+  script(src="scripts.js")

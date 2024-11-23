@@ -5,12 +5,14 @@ dotenv.config({ path: "./config.env" });
 const app = require("./app");
 
 //   CONNECT DATABASE
-// const DB_LOCAL = process.env.DATABASE_LOCAL;
-const DB = process.env.DATABASE.replace(
-  "<db_password>",
-  process.env.DATABASE_PASSWORD
-);
-mongoose.connect(DB).then(() => console.log("Database Connected Succesfully!"));
+const DB_LOCAL = process.env.DATABASE_LOCAL;
+// const DB = process.env.DATABASE.replace(
+//   "<db_password>",
+//   process.env.DATABASE_PASSWORD
+// );
+mongoose
+  .connect(DB_LOCAL)
+  .then(() => console.log("Database Connected Succesfully!"));
 
 const port = process.env.PORT || 9000;
 

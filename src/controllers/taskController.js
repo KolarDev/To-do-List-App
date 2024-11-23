@@ -7,23 +7,30 @@ const Email = require("../utils/notificator");
 const addTask = async (req, res, next) => {
   // const task = Task.create(req.body);
 
-  const { title, description, dueDate, status, priority } = req.body;
+  try {
+    const { title, description, dueDate, status, priority } = req.body;
 
-  const task = await Task.create({
-    title,
-    description,
-    dueDate,
-    status,
-    priority,
-    user: req.user._id,
-  });
+    const task = await Task.create({
+      title,
+      description,
+      dueDate,
+      status,
+      priority,
+      user: req.user._id,
+    });
 
-  res.status(201).json({
-    status: "success",
-    data: {
-      task,
-    },
-  });
+    res.status(201).json({
+      status: "success",
+      data: {
+        task,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "Failed!",
+      message: "Error adding your task",
+    });
+  }
 };
 
 // Get all tasks
@@ -42,7 +49,7 @@ const getAllTasks = (req, res, next) => {
 
 // Get all tasks
 const getMyTasks = (req, res, next) => {
-  const tasks = Task.findById({ user: req.user._id });
+  const tasks = Task.find({ user: req.user._id }).lean();
 
   if (!tasks) next(new AppError("No task found!", 404));
 
